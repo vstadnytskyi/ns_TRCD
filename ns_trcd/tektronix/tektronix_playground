@@ -1,0 +1,87 @@
+##how to connect
+from __future__ import division     #so that int(1)/int(2) = float(0.5) instead of int(0)
+from visual import *                #import vpython lib so that function calls don't have to be visual.function()
+import visa                         #import NI-VISA wrapper (interface with equipment). Function calls are visa.function()
+import sys                          #import system lib (system == python interpreter, not the os)
+import numpy                        #import numeric library
+import time                         #import time library
+import os            #import operating system library
+import matplotlib.pyplot as plt
+
+#example commands
+##tek.query('ACQ:STATE?')
+##tek.write('ACQ:STATE RUN')
+##tek.query("DATa:ENCdg?")
+##tek.query('DATa:SOUrce?') - show which waveform is selected
+##tek.write('DATa:SOUrce CH2') - select waveform
+
+def temp 
+    print(tek.query('ACQ:STATE?'))
+    print(tek.query("*IDN?"))
+    tek.write('*IDN?')
+    print(tek.read_raw())
+
+    tek.write('DATa:SOUrce CH4') #Select channel 2
+    print(tek.query('DATa:SOUrce?')) #check if channel 2 is selected
+    tek.write('DATa:ENCdg ASCii')
+    print('Encoding of data',tek.query('DATa:ENCdg?'))
+    tek.write('WFMOutpre:BYT_Nr 4')
+    print('This is the number of bytes per data point',
+    tek.query('WFMOutpre:BYT_Nr?'))
+
+    tek.write('DATa:STARt 1')
+    tek.write('DATa:STOp 10000')
+    print('Start=',tek.query('DATa:STARt?'))
+    print('Stop=',tek.query('DATa:STOp?'))
+
+    waveform_parameters = tek.query('WFMOutpre?')
+    print('OUT parameters',waveform_parameters)
+    waveform_parameters_num = numpy.array(waveform_parameters)
+
+    #data = tek.query('CURVe?')
+    #print('length of data file',len(data))
+    #values = tek.query_binary_values('CURV?', datatype='l', is_big_endian=True)
+    values = tek.query_ascii_values('CURV?', separator = ',')
+    print('values length = ',len(values))
+    data = numpy.array(values)
+
+    print('Waveform data point format = ',tek.query("WFMOutpre:PT_Fmt?"))
+    print('Acquisition parameters for the waveform = ',tek.query("WFMOutpre:WFId?"))
+    y_mult_factor_str =tek.query("WFMOutpre:YMULt?")
+    print 'type of y_mult_factor_str', type(y_mult_factor_str)
+    print('Vertical scale factor = ',y_mult_factor_str)
+    y_mult_factor_num = float(y_mult_factor_str)
+    print y_mult_factor_num
+
+    tek.write('ACQ:STATE RUN')
+
+#################################################
+## Initialize connection ##
+#################################################
+rm = visa.ResourceManager()
+reslist=rm.list_resources()
+print 'List of Resources \n' ,reslist
+tek = rm.open_resource('TCPIP::192.168.10.102::gpib0,1::INSTR')
+ 
+#################################################
+## Select waveform to download ##
+#################################################
+
+#################################################
+## Acquire parameters of the selected waveform ##
+#################################################
+def acquire_par_waveform
+    x_length = 0;
+    x_step = 0;
+    y_scale_factor = 0;
+    ###Horizontal length
+    x_length_str =tek.query("WFMOutpre:NR_Pt?")
+    x_length = float(x_length_str)
+    ###Vertical scale factor
+    y_scale_factor_str =tek.query("WFMOutpre:YMULt?")
+    y_scale_factor= float(y_scale_factor_str)
+    ### Horizontal sampling interval
+    #tek.query()
+
+#################################################
+################################################# 
